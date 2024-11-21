@@ -1,8 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { FourSquare } from "react-loading-indicators";
+import { BlinkBlur } from "react-loading-indicators";
 import { useParams } from "react-router-dom";
-
+import CIMBNiaga from './../../images/cimb.png'
 const Detail =()=>{
     const {id} = useParams()
     const [loading,setLoading] = useState()
@@ -129,7 +129,10 @@ const Detail =()=>{
             
             </div>
             {loading?<div style={{position:'fixed',zIndex:'99',background:'rgba(0,0,0,0.3)',display:'flex',justifyContent:'center',alignItems:'center',fontSize:'30px',top:0,left:0,right:0,bottom:0}}>
-            <FourSquare color="red" size="medium" text="" textColor="" />
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+            <img alt="cimb" style={{width:'300px',marginBottom:'10px'}} src={CIMBNiaga}></img>
+            <BlinkBlur color="#FF0000" size="large" text="" textColor="" />
+            </div>
             </div>:""}
             <div style={{display:'flex', alignItems:'center',gap:'50px'}}>
                 <div style={{width:'150px'}}>Type Page :</div>

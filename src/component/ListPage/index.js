@@ -1,8 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react"
 import DataTable from 'react-data-table-component';
-import { FourSquare } from "react-loading-indicators";
+import { BlinkBlur } from "react-loading-indicators";
 import { useParams } from "react-router-dom";
+import CIMBNiaga from './../../images/cimb.png'
 const columns = [
     {
 		name: 'ID',
@@ -51,7 +52,10 @@ const ListPage = ()=>{
     return(
         <div style={{width:'700px'}}>
             {loading?<div style={{position:'fixed',zIndex:'99',background:'rgba(0,0,0,0.3)',display:'flex',justifyContent:'center',alignItems:'center',fontSize:'30px',top:0,left:0,right:0,bottom:0}}>
-            <FourSquare color="red" size="medium" text="" textColor="" />
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+            <img alt="cimb" style={{width:'300px',marginBottom:'10px'}} src={CIMBNiaga}></img>
+            <BlinkBlur color="#FF0000" size="large" text="" textColor="" />
+            </div>
             </div>:""}
             <div style={{marginTop:'20px',marginBottom:'20px',display:'flex',justifyContent:'start',marginLeft:'20px'}}>
                 <div onClick={()=>{window.location=`/create/${id}`}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Create</div>
