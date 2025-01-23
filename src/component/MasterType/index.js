@@ -77,7 +77,7 @@ const MasterTypeList = ()=>{
             
         setDataHmlt("")
         setLoading(true)
-        axios.get(`http://localhost:8081/onboarding/v1/form/donwload-file/${form_id}?type=pdf`,{responseType: 'blob',headers:{"user-id":user_id,"request-id":"asa","Content-Type":"application/pdf"}}).then(response=>{
+        axios.get(`https://portal-onboarding-service.onrender.com/onboarding/v1/form/donwload-file/${form_id}?type=pdf`,{responseType: 'blob',headers:{"user-id":user_id,"request-id":"asa","Content-Type":"application/pdf"}}).then(response=>{
         
             download(response.data, "form-pdf.pdf", "application/pdf")
             //    if(res?.data){
@@ -122,7 +122,7 @@ const MasterTypeList = ()=>{
             
         setDataHmlt("")
         setLoading(true)
-        axios.get(`http://localhost:8081/onboarding/v1/form/donwload-file/${form_id}?type=html`,{headers:{"user-id":user_id,"request-id":"asa","Content-Type":"application/pdf"}}).then(res=>{
+        axios.get(`https://portal-onboarding-service.onrender.com/onboarding/v1/form/donwload-file/${form_id}?type=html`,{headers:{"user-id":user_id,"request-id":"asa","Content-Type":"application/pdf"}}).then(res=>{
         
            
                if(res?.data?.data){
