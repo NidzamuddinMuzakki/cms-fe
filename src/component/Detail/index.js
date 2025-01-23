@@ -1,12 +1,18 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { BlinkBlur } from "react-loading-indicators";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CIMBNiaga from './../../images/cimb.png'
 const Detail =()=>{
     const {id} = useParams()
     const [loading,setLoading] = useState()
+     const [showDetail,setShowDetail]  = useState({})
+    const [uuidLandingPage,setUUIDLandingPage] = useState('')
+     const [dataActivity, setDataActivity] = useState([])
+    const navigate = useNavigate()
+     const [loadingActivity,setLoadingActivity] = useState()
     const [errros,setErrors] = useState()
+    // const [staticTypeId,setStaticTypeId] = useState(0)
     const handleSave = ()=>{
         var bodyFormData = new FormData();
         bodyFormData.set("id",id)
@@ -24,15 +30,16 @@ const Detail =()=>{
         bodyFormData.set("pc_button_cta",state.pc_button_cta)
         bodyFormData.set("pc_delete_resource",state.pc_resource_delete)
 
+        bodyFormData.set("pc_button_position",state.pc_button_position)
         
 
         setLoading(true)
-        axios.put(`http://3.105.240.231/v1/cms/pagecontent`,
+        axios.put(`https://portal-cms-service-latest.onrender.com/cms/v1/admin/pagecontent`,
        bodyFormData,
-            {headers: { "Content-Type": `multiplepart/form-data`,"user_id":1}
+            {headers: { "Content-Type": `multiplepart/form-data`,"user-id":"nidzam"}
           }).then(res=>{
             console.log(res)
-           window.location=`/listofpage/${state.pc_page_type_id}`
+           navigate(`/listofpage/${state.pc_page_type_id}`)
         }).catch(err=>{
             
             setErrors(err?.response?.data?.meta)
@@ -54,11 +61,26 @@ const Detail =()=>{
         pc_ordering:1,
         pc_button_name_id:"",
         pc_button_name_en:"",
+        pc_button_position:"",
         pc_button_cta:""
     })
     const [options,setOptions] = useState([]);
+    const [optionsButton,setOptionsButton] = useState([
+        {
+            id:"",
+            value:""
+        },
+        {
+            id:"left",
+            value:"left"
+        },
+        {
+            id:"right",
+            value:"right"
+        }
+    ]);
     useEffect(()=>{
-        axios.get("http://3.105.240.231/v1/cms/pagecontent/mastertype/list").then(res=>{
+        axios.get("https://portal-cms-service-latest.onrender.com/cms/v1/admin/pagecontent/mastertype/list").then(res=>{
             if(res?.data?.data){
              setOptions(res?.data?.data)
             }else{
@@ -71,9 +93,11 @@ const Detail =()=>{
     useEffect(()=>{
         if(id){
             setLoading(true)
-            axios.get(`http://3.105.240.231/v1/cms/pagecontent/${id}`).then(res=>{
+            axios.get(`https://portal-cms-service-latest.onrender.com/cms/v1/admin/pagecontent/detail/${id}`).then(res=>{
                 if(res?.data?.data){
                     let data = res?.data?.data
+                    setUUIDLandingPage(data?.pc_landing_page_uuid)
+                    // setStaticTypeId(data?.pc_page_type_id)
                     setState((sss)=>{return{...sss,
                         pc_page_type_id:data.pc_page_type_id,
                         pc_title_id:data.pc_title_id,
@@ -87,8 +111,8 @@ const Detail =()=>{
                         pc_ordering:data.pc_ordering,
                         pc_button_name_id:data.pc_button_name_id,
                         pc_button_name_en:data.pc_button_name_en,
-                        pc_button_cta:data.pc_button_cta
-
+                        pc_button_cta:data.pc_button_cta,
+                        pc_button_position:data?.pc_button_position
                     
                     }})
                 }else{
@@ -119,13 +143,32 @@ const Detail =()=>{
         
         setState({...state,[e.target.name]:e.target.files[0]})
     }
-    console.log(state)
+    useEffect(()=>{
+        if(uuidLandingPage){
+            setLoadingActivity(true)
+            // 
+            axios.get(`https://portal-audit-trail-service.onrender.com/ats/v1/audit-trail/list?page=${1}&row_perpage=${2000}&module_name=landing-page,audit-approval-service&object_id=${uuidLandingPage}`,{headers:{"user-id":"nidzam"}}).then(res=>{
+                if(res?.data?.data){
+                    setDataActivity(res?.data?.data)
+                }
+            }).catch(err=>{
+                console.log(err)
+            }).finally(()=>{
+                setLoadingActivity(false)
+            })
+        }
+    },[uuidLandingPage])
+    const handleClickDetail = (id)=>{
+        setShowDetail((aaa)=>{return {...aaa,[id]:!aaa[id]} })
+    }
+    
+    console.log(state,uuidLandingPage)
     return(
         <div style={{margin:'10px 10px 10px 10px'}}>
             <div style={{marginTop:'20px',marginBottom:'20px',display:'flex',justifyContent:'start',marginLeft:'20px'}}>
                
-                <div onClick={()=>{window.location=`/`}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Home</div>
-                <div onClick={()=>{window.location=`/listofpage/${id}`}} style={{marginLeft:'20px',cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>List Page</div>
+                <div onClick={()=>{navigate(`/`)}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Home</div>
+                <div onClick={()=>{navigate(`/listofpage/${state?.pc_page_type_id}`)}} style={{marginLeft:'20px',cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>List Page</div>
             
             </div>
             {loading?<div style={{position:'fixed',zIndex:'99',background:'rgba(0,0,0,0.3)',display:'flex',justifyContent:'center',alignItems:'center',fontSize:'30px',top:0,left:0,right:0,bottom:0}}>
@@ -198,9 +241,24 @@ const Detail =()=>{
                 <div style={{width:'150px'}}>Button EN :</div>
                 <input onChange={handleChange} type="text" name="pc_button_name_en" value={state.pc_button_name_en}></input>
             </div>
+            <div style={{display:'flex', alignItems:'center',gap:'50px'}}>
+                <div style={{width:'150px'}}>Button Position :</div>
+                <select
+                    value={state.pc_button_position}
+                    onChange={handleChange}
+                    style={{height:'30px',width:'200px'}}
+                    name="pc_button_position"
+                    >
+                    {optionsButton.map((option) => (
+                    <option key={option.id} value={option.id}>
+                        {option.value}
+                    </option>
+                        ))}
+                </select>
+            </div>
             <div style={{display:'flex',alignItems:'center',gap:'50px'}}>
                 <div style={{width:'150px'}}>Button CTA :</div>
-                <input onChange={handleChange} type="number" name="pc_button_cta" value={state.pc_button_cta}></input>
+                <input onChange={handleChange} type="text" name="pc_button_cta" value={state.pc_button_cta}></input>
             </div>
 
             
@@ -210,6 +268,50 @@ const Detail =()=>{
                 <div onClick={()=>{handleSave()}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Save</div>
             </div> 
             <div style={{marginTop:'20px'}}>{JSON.stringify(errros)}</div>
+
+
+            <h1>Activity Log</h1>
+            {loadingActivity?<p>Loading....</p>:""}
+            {dataActivity?.length?dataActivity.map((val, key)=>{
+                return(
+                    <div key={key}>
+                        <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
+                            <label>UserID :</label>
+                            <div>{val?.user_id}</div>
+                        </div>
+                        <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
+                            <label>ObjectID :</label>
+                            <div>{val?.object_id}</div>
+                        </div>
+                        <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
+                            <label>Module Name :</label>
+                            <div>{val?.module_name}</div>
+                        </div>
+                        <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
+                            <label>Event Type :</label>
+                            <div>{val?.event_type}</div>
+                        </div>
+                        <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
+                            <label>TimeStamp :</label>
+                            <div>{val?.timestamp}</div>
+                        </div>
+                        <div style={{textDecoration:'underline',color:'blue', cursor:'pointer'}} id={key} onClick={()=>{handleClickDetail(key)}}>see Detail</div>
+                        <div style={{display:showDetail[key]?'block':'none'}}>
+                            <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
+                                <label>Request :</label>
+                                <div>{val?.request}</div>
+                            </div>
+                            <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
+                                <label>Response :</label>
+                                <div>{val?.response}</div>
+                            </div>
+
+                        </div>
+                        <div style={{marginBottom:'20px'}}></div>
+                       
+                    </div>
+                )
+            }):""}
         </div>
     )
 }

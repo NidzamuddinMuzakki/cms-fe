@@ -1,13 +1,27 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { BlinkBlur } from "react-loading-indicators";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CIMBNiaga from './../../images/cimb.png'
 const Insert =()=>{
     const {id} = useParams()
     const [loading,setLoading] = useState()
     const [errros,setErrors] = useState()
-
+    const navigate = useNavigate()
+    const [optionsButton,setOptionsButton] = useState([
+        {
+            id:"",
+            value:""
+        },
+        {
+            id:"left",
+            value:"left"
+        },
+        {
+            id:"right",
+            value:"right"
+        }
+    ]);
     const handleSave = ()=>{
         var bodyFormData = new FormData();
         bodyFormData.set("pc_page_type_id",state.pc_page_type_id)
@@ -22,14 +36,16 @@ const Insert =()=>{
         bodyFormData.set("pc_button_name_id",state.pc_button_name_id)
         bodyFormData.set("pc_button_name_en",state.pc_button_name_en)
         bodyFormData.set("pc_button_cta",state.pc_button_cta)
+        
+        bodyFormData.set("pc_button_position",state.pc_button_position)
         setLoading(true)
 
-        axios.post(`http://3.105.240.231/v1/cms/pagecontent`,
+        axios.post(`https://portal-cms-service-latest.onrender.com/cms/v1/admin/pagecontent`,
        bodyFormData,
-            {headers: { "Content-Type": `multiplepart/form-data`,"user_id":1}
+            {headers: { "Content-Type": `multiplepart/form-data`,"user-id":"nidzam"}
           }).then(res=>{
             console.log(res)
-           window.location=`/listofpage/${id}`
+           navigate(`/approval-engine`)
         }).catch(err=>{
             setErrors(err?.response?.data?.meta)
         }).finally(()=>{
@@ -49,7 +65,8 @@ const Insert =()=>{
         pc_ordering:1,
         pc_button_name_id:"",
         pc_button_name_en:"",
-        pc_button_cta:""
+        pc_button_cta:"",
+        pc_button_position:"",
     })
     useEffect(()=>{
         setState((sss)=>{return{...sss,pc_page_type_id:id}})
@@ -66,8 +83,8 @@ const Insert =()=>{
         <div style={{margin:'10px 10px 10px 10px'}}>
             <div style={{marginTop:'20px',marginBottom:'20px',display:'flex',justifyContent:'start',marginLeft:'20px'}}>
                
-               <div onClick={()=>{window.location=`/`}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Home</div>
-               <div onClick={()=>{window.location=`/listofpage/${id}`}} style={{marginLeft:'20px',cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>List Page</div>
+               <div onClick={()=>{navigate(`/`)}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Home</div>
+               <div onClick={()=>{navigate(`/listofpage/${id}`)}} style={{marginLeft:'20px',cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>List Page</div>
            
            </div>
            {loading?<div style={{position:'fixed',zIndex:'99',background:'rgba(0,0,0,0.3)',display:'flex',justifyContent:'center',alignItems:'center',fontSize:'30px',top:0,left:0,right:0,bottom:0}}>
@@ -121,9 +138,24 @@ const Insert =()=>{
                 <div style={{width:'150px'}}>Button EN :</div>
                 <input onChange={handleChange} type="text" name="pc_button_name_en" value={state.pc_button_name_en}></input>
             </div>
+            <div style={{display:'flex', alignItems:'center',gap:'50px'}}>
+                <div style={{width:'150px'}}>Button Position :</div>
+                <select
+                    value={state.pc_button_position}
+                    onChange={handleChange}
+                    style={{height:'30px',width:'200px'}}
+                    name="pc_button_position"
+                    >
+                    {optionsButton.map((option) => (
+                    <option key={option.id} value={option.id}>
+                        {option.value}
+                    </option>
+                        ))}
+                </select>
+            </div>
             <div style={{display:'flex',alignItems:'center',gap:'50px'}}>
                 <div style={{width:'150px'}}>Button CTA :</div>
-                <input onChange={handleChange} type="number" name="pc_button_cta" value={state.pc_button_cta}></input>
+                <input onChange={handleChange} type="text" name="pc_button_cta" value={state.pc_button_cta}></input>
             </div>
 
             

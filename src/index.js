@@ -3,35 +3,19 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import ListPage from './component/ListPage';
-import Create from './component/Create'
+
 import {
-  createBrowserRouter,
-  RouterProvider,
+
+  // BrowserRouter,
+  HashRouter
 } from "react-router-dom";
-import Detail from './component/Detail';
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App></App>,
-  },
-  {
-    path: "/listofpage/:id",
-    element: <ListPage></ListPage>,
-  },
-  {
-    path: "/create/:id",
-    element: <Create></Create>,
-  },
-  {
-    path: "/detail/:id",
-    element: <Detail></Detail>,
-  },
-]);
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <HashRouter>
+      <App></App>
+    </HashRouter>
   </React.StrictMode>
 );
 

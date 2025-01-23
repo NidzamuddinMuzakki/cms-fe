@@ -36,3 +36,25 @@
     transform: rotate(360deg);
   }
 }
+.Menu{
+  height:46px;
+  cursor:pointer;
+  width:100%;
+  justify-content:center;
+  display:flex;
+  align-items:center; 
+  transition: 0.3s;
+}
+
+.Menu:hover{
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.Close {
+  color:#fff; text-shadow:0 0 5px #000;
+  cursor: pointer;
+  font-size: 30px;
+  position: absolute;
+  bottom: 0;
+  right: 30px;
+}

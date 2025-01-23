@@ -2,8 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react"
 import DataTable from 'react-data-table-component';
 import { BlinkBlur } from "react-loading-indicators";
-import { useParams } from "react-router-dom";
 import CIMBNiaga from './../../images/cimb.png'
+import { useNavigate, useParams } from "react-router-dom";
 const columns = [
     {
 		name: 'ID',
@@ -24,7 +24,11 @@ const columns = [
     {
 		name: 'Title EN',
 		selector: row => row.pc_title_en,
-	},
+	},{
+        name:"Action",
+        
+    }
+    
 ];
 
 
@@ -32,11 +36,32 @@ const columns = [
 const ListPage = ()=>{
     const [data,SetData]= useState([])
     const {id} = useParams()
-  
+    const navigate = useNavigate()
     const [loading,setLoading] = useState()
+    const handleButtonClick = (e,id)=>{
+        setLoading(true)
+        axios.delete(`https://portal-cms-service-latest.onrender.com/cms/v1/admin/pagecontent/${id}`,{headers:{"user-id":"nidzam"}}).then(res=>{
+            console.log(res?.data?.data)
+            navigate("/approval-engine")
+        }).catch(err=>{
+            alert(JSON.stringify(err?.response?.data?.meta))
+        }).finally(()=>{
+            setLoading(false)
+        })
+
+    }
+    if(columns.findIndex(aa=>aa.name==="Action")!==-1){
+        columns[columns.findIndex(aa=>aa.name=="Action")]['selector']=(row) => (
+            <button
+                className="btn btn-outline btn-xs"
+                onClick={(e) => handleButtonClick(e, row.id)}
+            >
+                Delete
+            </button>)
+    }
     useEffect(()=>{
         setLoading(true)
-        axios.get(`http://3.105.240.231/v1/cms/pagecontent/type/${id}`).then(res=>{
+        axios.get(`https://portal-cms-service-latest.onrender.com/cms/v1/admin/pagecontent/type/${id}`).then(res=>{
            if(res?.data?.data){
             SetData(res?.data?.data)
            }else{
@@ -58,15 +83,16 @@ const ListPage = ()=>{
             </div>
             </div>:""}
             <div style={{marginTop:'20px',marginBottom:'20px',display:'flex',justifyContent:'start',marginLeft:'20px'}}>
-                <div onClick={()=>{window.location=`/create/${id}`}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Create</div>
-                <div onClick={()=>{window.location=`/`}} style={{marginLeft:'20px',cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Home</div>
+                <div onClick={()=>{navigate(`/create/${id}`)}} style={{cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Create</div>
+                <div onClick={()=>{navigate(`/`)}} style={{marginLeft:'20px',cursor:'pointer', padding:'10px 10px', borderRadius:'10px', boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px"}}>Home</div>
             
             </div>  
 <DataTable
 			columns={columns}
 			data={data}
-            onRowClicked={(row)=>{window.location=`/detail/${row.id}`}}
+            onRowClicked={(row)=>{navigate(`/detail/${row.id}`)}}
 		/>
+        
         </div>
     )
 }
